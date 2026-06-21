@@ -1,0 +1,90 @@
+{
+  "tiburtina, roma, lazio, italia": {
+    "lat": 41.9109,
+    "lng": 12.5292
+  },
+  "tiburtina, latina, lazio, italia": {
+    "lat": 41.4676,
+    "lng": 12.9036
+  },
+  "cinecittà, roma, lazio, italia": {
+    "lat": 41.8488,
+    "lng": 12.5694
+  },
+  "cinecitta, roma, lazio, italia": {
+    "lat": 41.8488,
+    "lng": 12.5694
+  },
+  "eur, roma, lazio, italia": {
+    "lat": 41.8315,
+    "lng": 12.4704
+  },
+  "ostia, roma, lazio, italia": {
+    "lat": 41.7323,
+    "lng": 12.2785
+  },
+  "roma, roma, lazio, italia": {
+    "lat": 41.8933,
+    "lng": 12.4829
+  },
+  "latina, latina, lazio, italia": {
+    "lat": 41.4676,
+    "lng": 12.9036
+  },
+  "viterbo, viterbo, lazio, italia": {
+    "lat": 42.4173,
+    "lng": 12.1047
+  },
+  "rieti, rieti, lazio, italia": {
+    "lat": 42.4013,
+    "lng": 12.8622
+  },
+  "frosinone, frosinone, lazio, italia": {
+    "lat": 41.6397,
+    "lng": 13.3411
+  },
+  "tivoli, roma, lazio, italia": {
+    "lat": 41.9609,
+    "lng": 12.7989
+  },
+  "guidonia, roma, lazio, italia": {
+    "lat": 41.9976,
+    "lng": 12.7275
+  },
+  "pomezia, roma, lazio, italia": {
+    "lat": 41.6688,
+    "lng": 12.5036
+  },
+  "serve, roma, lazio, italia": {
+    "lat": 42.0406077,
+    "lng": 11.9087431
+  },
+  "via di santa maria mediatrice 10 roma, roma, lazio, italia": {
+    "lat": 41.8986336,
+    "lng": 12.4448574
+  },
+  "via cola di rienzo, roma, roma, lazio, italia": {
+    "lat": 41.9065997,
+    "lng": 12.4596265
+  },
+  "piazza bologna, roma, roma, lazio, italia": {
+    "lat": 41.9139093,
+    "lng": 12.5211773
+  },
+  "via tuscolana 500, roma, roma, lazio, italia": {
+    "lat": 41.8704403,
+    "lng": 12.5355355
+  },
+  "stazione termini roma, roma, lazio, italia": {
+    "lat": 41.8996176,
+    "lng": 12.50625
+  },
+  "scuola calcio, roma, lazio, italia": {
+    "lat": 41.8149148,
+    "lng": 12.5733524
+  },
+  "altri, roma, lazio, italia": {
+    "lat": 41.7582893,
+    "lng": 12.2421638
+  }
+}

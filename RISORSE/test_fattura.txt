@@ -1,0 +1,7 @@
+Fattura N. 104/2026
+Emittente: Dott.ssa logopedista Laura Rossi
+Paziente: Marco
+Data: 15 Giugno 2026
+Descrizione: Prestazione di terapia logopedica - ciclo di 4 sedute mensili.
+Importo totale: € 200,00
+Note: Pagamento tracciato a mezzo bonifico bancario. Trattamento eseguito nel rispetto delle linee guida regionali.
