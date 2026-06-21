@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mismo - Supporto per Genitori (Autismo)</title>
+  <meta name="description" content="Mismo è uno spazio conversazionale sicuro ed empatico per supportare i genitori nella gestione quotidiana di bambini e ragazzi nello spettro autistico.">
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+  
+  <!-- Local Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=1.3.0">
+  
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+  
+  <!-- Markdown Parser CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="light-theme">
+  <div class="app-container">
+    
+    <!-- Sidebar: Profile & Actions -->
+    <aside class="sidebar" id="app-sidebar">
+      <header class="sidebar-header">
+        <div class="logo-container">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            <path d="M12 13.5l-0.85-.77C7.6 9.42 5.5 7.42 5.5 4.93 5.5 2.91 7.07 1.33 9.07 1.33c1.13 0 2.22.53 2.93 1.36.71-.83 1.8-1.36 2.93-1.36 2 0 3.57 1.58 3.57 3.6 0 2.49-2.1 4.49-5.65 7.8l-.85.77z" transform="translate(6, 5.5) scale(0.5)" fill="currentColor" stroke="none"></path>
+          </svg>
+          <h1 class="logo-title">Mismo</h1>
+        </div>
+      </header>
+
+      <!-- Sidebar content wrapper (for easy scroll and panels) -->
+      <div class="sidebar-body">
+        
+        <!-- PANEL A: ACTIVE PROFILE VIEW & SELECTOR -->
+        <div id="active-profile-panel" class="sidebar-panel">
+          <section class="profile-section">
+            <h2 class="section-title">Bambino Attivo</h2>
+            <div class="select-container">
+              <select id="profile-select" class="profile-select">
+                <option value="">Nessuno (Profilo Generico)</option>
+                <!-- Dynamic options -->
+              </select>
+            </div>
+            
+            <div class="profile-actions-grid" style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px;">
+              <button class="btn btn-secondary btn-sm" id="btn-register-trigger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Registra Nuovo Bambino
+              </button>
+              <button class="btn btn-secondary btn-sm btn-danger" id="btn-delete-profile" style="border-color: #fca5a5; color: #dc2626; display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Rimuovi Bambino Selezionato
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <!-- PANEL B: CHILD REGISTRATION FORM (Hidden by default) -->
+        <div id="registration-panel" class="sidebar-panel hidden">
+          <section class="profile-section">
+            <h2 class="section-title">Nuova Registrazione</h2>
+            <p class="section-description">Crea un profilo dedicato per consentire all'AI di memorizzare sensibilità ed evoluzioni specifiche.</p>
+            
+            <div class="profile-form">
+              <div class="input-group">
+                <label for="reg-child-name">Nome / Pseudonimo</label>
+                <input type="text" id="reg-child-name" placeholder="Es. Luca o Bimbo A" autocomplete="off">
+                <span class="error-msg" id="reg-name-error" style="color: #dc2626; font-size: 11px; display: none; margin-top: 2px; font-weight: 500;">Il nome è obbligatorio (minimo 2 lettere).</span>
+              </div>
+              
+              <div class="checkbox-group" style="margin-top: -6px; margin-bottom: 4px;">
+                <input type="checkbox" id="reg-use-pseudonym">
+                <label for="reg-use-pseudonym">Questo nome è uno pseudonimo</label>
+              </div>
+
+              <div class="input-group">
+                <label for="reg-child-age">Età (under 18)</label>
+                <input type="number" id="reg-child-age" min="1" max="17" placeholder="Es. 6">
+                <span class="error-msg" id="reg-age-error" style="color: #dc2626; font-size: 11px; display: none; margin-top: 2px; font-weight: 500;">L'età deve essere compresa tra 1 e 17 anni.</span>
+              </div>
+
+              <div class="input-group">
+                <label for="reg-child-region">Regione</label>
+                <input type="text" id="reg-child-region" value="Lazio" readonly style="background-color: var(--bg-card); cursor: not-allowed; font-weight: 500;">
+              </div>
+
+              <div class="input-group">
+                <label for="reg-child-province">Provincia</label>
+                <div class="select-container">
+                  <select id="reg-child-province" class="profile-select" style="background-color: var(--bg-card);">
+                    <option value="Roma">Roma</option>
+                    <option value="Frosinone">Frosinone</option>
+                    <option value="Latina">Latina</option>
+                    <option value="Rieti">Rieti</option>
+                    <option value="Viterbo">Viterbo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="reg-child-city">Città / Comune</label>
+                <div class="select-container">
+                  <select id="reg-child-city" class="profile-select" style="background-color: var(--bg-card);">
+                    <!-- Dynamic -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="reg-child-notes">Sensibilità e dati iniziali utili</label>
+                <textarea id="reg-child-notes" rows="3" placeholder="Es. Ipersensibile al phon, ama i treni, si calma toccando la plastilina..."></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-primary" id="reg-save-btn">
+                  <span>Registra</span>
+                </button>
+                <button type="button" class="btn btn-secondary" id="reg-cancel-btn">Annulla</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+      </div>
+
+      <!-- Navigation & Quick Tools -->
+      <nav class="sidebar-nav" style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn btn-secondary" id="clear-chat-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Nuova Conversazione
+        </button>
+        <button class="btn btn-secondary" id="show-dashboard-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          Dashboard Suggerimenti
+        </button>
+        <button class="btn btn-secondary" id="show-map-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="12" cy="10" r="3"></circle>
+            <path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z"></path>
+          </svg>
+          Mappa Strutture Lazio
+        </button>
+      </nav>
+
+      <footer class="sidebar-footer">
+        <p>Mismo v1.1.0</p>
+        <p class="footer-sub">Ideato per il supporto alle famiglie</p>
+      </footer>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      
+      <!-- Top navbar for mobile -->
+      <header class="top-nav">
+        <button class="menu-toggle-btn" id="menu-toggle" aria-label="Apri menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="top-nav-title">Mismo</div>
+        <div style="width: 24px;"></div> <!-- Spacer -->
+      </header>
+
+      <!-- Workspace Tabs (Only visible when child profile is selected) -->
+      <div class="workspace-tabs hidden" id="workspace-tabs">
+        <button class="tab-btn active" id="tab-chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Chat con Mismo
+        </button>
+        <button class="tab-btn" id="tab-profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Profilo del Bambino
+        </button>
+      </div>
+
+      <!-- Split Layout: Chat & Map Side-by-Side -->
+      <div class="workspace-split">
+        <!-- Chat View -->
+        <section class="chat-container">
+          
+          <!-- Welcome Screen (Shown when chat is empty) -->
+          <div class="welcome-screen" id="welcome-screen">
+            <div class="dashboard-header">
+              <div class="dashboard-header-left">
+                <h2>Dashboard Suggerimenti</h2>
+                <p>Seleziona un'area di interesse per avviare una conversazione o consultare informazioni utili.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="close-dashboard-btn" style="display: none;">
+                Torna alla Chat
+              </button>
+            </div>
+
+            <!-- Quick Prompts Starters Grid -->
+            <div class="starters-grid dynamic-starters">
+              <div class="starter-card" id="card-about" data-prompt="Vorrei raccontarti qualcosa su mio figlio per aiutarti a conoscerlo meglio: farti un'idea del suo carattere, delle sue peculiarità e cosa lo rende speciale. Raccontami!">
+                <div class="card-icon-wrapper about-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-about-title">Raccontami di tuo figlio</h3>
+                  <p id="card-about-desc">Condividi i dettagli sul carattere, sulle passioni e sulle abitudini di tuo figlio per consentirmi di conoscerlo e supportarvi al meglio.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-buro" data-prompt="Ho bisogno di aiuto per organizzare l'assistenza burocratica per mio figlio. Quali sono le procedure principali e le agevolazioni utili per la nostra residenza?">
+                <div class="card-icon-wrapper buro-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-buro-title">Supporto burocratico</h3>
+                  <p id="card-buro-desc">Esplora i contributi economici regionali, le agevolazioni (come la Legge 104) e la modulistica del Lazio per rimborsi e tutele di tuo figlio.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-study" data-prompt="Vorrei approfondire e saperne di più sul Disturbo dello Spettro Autistico (DSA). Quali sono i concetti base, le letture consigliate e le linee guida per studiare questa tematica?">
+                <div class="card-icon-wrapper study-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-study-title">Scopri di più sulla DSA</h3>
+                  <p id="card-study-desc">Approfondisci i concetti cardine dello Spettro Autistico, le letture consigliate e le linee guida scientifiche evidence-based per orientarti.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-school" data-prompt="Ho bisogno di supporto per organizzare la scuola per mio figlio. Quali sono i passaggi burocratici (PEI, PDP, richiesta dell'insegnante di sostegno) e i consigli pratici-concettuali per facilitare l'inserimento scolastico?">
+                <div class="card-icon-wrapper school-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-school-title">Supporto scolastico</h3>
+                  <p id="card-school-desc">Organizza l'inclusione scolastica per tuo figlio: tutele, supporto curriculare, differenze tra sostegno ed educatore e redazione del PEI.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-territory" data-prompt="Ho bisogno di trovare servizi del territorio per mio figlio nel Lazio. Quali centri convenzionati o professionisti ci sono in zona?">
+                <div class="card-icon-wrapper territory-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="10" r="3"></circle>
+                    <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-territory-title">Servizi del territorio</h3>
+                  <p id="card-territory-desc">Trova centri convenzionati, terapisti e associazioni nel Lazio. La mappa si aprirà per aiutarti a esplorare.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-sport" data-prompt="Vorrei informazioni su sport inclusivi, laboratori e attività per il tempo libero adatti a mio figlio nel Lazio. Quali associazioni o progetti ci sono?">
+                <div class="card-icon-wrapper sport-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-sport-title">Tempo libero e Sport inclusivi</h3>
+                  <p id="card-sport-desc">Trova attività sportive, laboratori artistici e tempo libero inclusivi per bambini neurodivergenti nel Lazio.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-calendar" data-prompt="Quali sono le scadenze burocratiche più importanti da ricordare quest'anno per la scuola (GLO, PEI) e per i contributi economici regionali (Modello A, Modello C) nel Lazio?">
+                <div class="card-icon-wrapper calendar-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-calendar-title">Calendario e scadenze</h3>
+                  <p id="card-calendar-desc">Tieni traccia delle scadenze burocratiche, delle date dei GLO e della presentazione dei modelli di rimborso.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-health" data-prompt="Cos'è il Servizio TOBIA (DAMA) nel Lazio e come funziona per facilitare le visite mediche e l'accesso alle cure ospedaliere o al pronto soccorso per mio figlio?">
+                <div class="card-icon-wrapper health-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="M12 8v8M9 12h6"></path>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-health-title">Sanità accessibile - Servizio Tobia</h3>
+                  <p id="card-health-desc">Scopri il percorso assistenziale TOBIA per visite mediche senza barriere e supporto per urgenze nel Lazio.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-market" data-prompt="Vorrei saperne di più sul mercatino e lo scambio di materiali per la CAA (Comunicazione Aumentativa Alternativa), libri modificati e tabelle di comunicazione. Come posso scambiare o creare supporti visivi?">
+                <div class="card-icon-wrapper market-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <path d="M3 9h18M3 15h18M9 3v18M15 3v18"></path>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-market-title">Mercatino e scambio materiali CAA</h3>
+                  <p id="card-market-desc">Condividi e scambia libri modificati, tabelle di Comunicazione Aumentativa Alternativa (CAA) e supporti visivi.</p>
+                </div>
+              </div>
+              <div class="starter-card" id="card-babysitting" data-prompt="Come posso trovare un servizio di baby-sitting specializzato o supporto domiciliare con educatori o tutor formati per la gestione di bambini nello spettro autistico?">
+                <div class="card-icon-wrapper babysitting-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div class="card-content-wrapper">
+                  <h3 id="card-babysitting-title">Baby-sitting specializzato</h3>
+                  <p id="card-babysitting-desc">Trova figure formate come educatori, tutor RBT o baby-sitter con esperienza per il supporto domiciliare.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat History -->
+          <div class="chat-messages" id="chat-messages">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <!-- Typing Indicator -->
+          <div class="typing-indicator-container hidden" id="typing-indicator">
+            <div class="typing-bubble">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <span class="typing-text">Mismo sta scrivendo...</span>
+          </div>
+
+          <!-- Input Area -->
+          <footer class="chat-input-container">
+            <form class="chat-input-form" id="chat-form">
+              <div class="textarea-wrapper">
+                <textarea 
+                  id="user-input" 
+                  rows="1" 
+                  placeholder="Scrivi un messaggio a Mismo..."
+                  aria-label="Messaggio per Mismo"
+                ></textarea>
+              </div>
+              <button type="submit" class="send-btn" id="send-btn" aria-label="Invia messaggio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </form>
+            <p class="disclaimer">
+              Mismo offre supporto informativo e di gestione quotidiana. Non costituisce consulenza medica, diagnosi o trattamento clinico.
+            </p>
+          </footer>
+
+        </section>
+
+        <!-- Map Sidebar Panel (Right Column) -->
+        <div id="map-overlay" class="map-sidebar hidden">
+          <header class="map-box-header">
+            <h2>Strutture e Professionisti nel Lazio</h2>
+            <button class="close-map-btn" id="close-map-btn" aria-label="Chiudi mappa">&times;</button>
+          </header>
+          <div class="map-toolbar">
+            <div class="filter-group">
+              <label for="filter-specialty">Specializzazione:</label>
+              <select id="filter-specialty">
+                <option value="all">Tutte le specializzazioni</option>
+                <option value="ABA">ABA</option>
+                <option value="Logopedista">Logopedia</option>
+                <option value="CAA">CAA (Comun. Aumentativa)</option>
+                <option value="TEACCH">TEACCH</option>
+                <option value="Sport">Tempo Libero e Sport</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-role">Ruolo:</label>
+              <select id="filter-role">
+                <option value="all">Tutti i ruoli</option>
+                <option value="Supervisore">Supervisore</option>
+                <option value="Tecnico">Tecnico / RBT</option>
+                <option value="Tutor">Tutor</option>
+              </select>
+            </div>
+          </div>
+          <div id="mismo-map"></div>
+        </div>
+      </div>
+
+      <!-- Profile Page View -->
+      <section class="profile-page-container hidden" id="profile-page-container">
+        <div class="profile-page-header">
+          <div class="profile-avatar-large">
+            <span id="profile-avatar-initials">M</span>
+          </div>
+          <div class="profile-header-info">
+            <h2 id="profile-page-title">Marco</h2>
+            <p class="profile-page-subtitle"><span id="profile-page-age">8</span> anni &bull; <span id="profile-page-residence">Roma, Lazio</span></p>
+          </div>
+          <div class="profile-header-actions">
+            <button class="btn btn-primary btn-sm" id="profile-btn-chat-shortcut">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              Apri Chat con Mismo
+            </button>
+          </div>
+        </div>
+
+        <div class="profile-page-grid">
+          <!-- Left Card: context.md viewer -->
+          <div class="profile-card profile-context-card">
+            <header class="card-header">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--accent-color); margin-right: 8px;">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Quadro Clinico e Comportamentale (contesto.md)
+              </h3>
+              <span class="live-badge" id="live-update-status" title="Aggiornato dall'AI in tempo reale">
+                <span class="live-dot"></span>
+                contesto.md
+              </span>
+            </header>
+            <div class="profile-card-content markdown-body" id="profile-context-content">
+              <!-- Rendered child context.md -->
+            </div>
+          </div>
+
+          <!-- Right Card: Documents & Referti -->
+          <div class="profile-card profile-docs-card">
+            <header class="card-header">
+              <h3>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--accent-color); margin-right: 8px;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                Documenti e Referti Clinici
+              </h3>
+            </header>
+            <div class="profile-card-content">
+              <p class="docs-description" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                Gestisci la documentazione organizzandola per categoria. Trascina i file direttamente nel rispettivo riquadro o clicca sul pulsante di caricamento.
+              </p>
+              
+              <div class="docs-categories-grid">
+                <!-- 1. Referti Medici -->
+                <div class="doc-category-box category-medical" id="dropzone-medical">
+                  <header class="category-header">
+                    <div class="category-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                      </svg>
+                    </div>
+                    <h4>Referti Medici</h4>
+                  </header>
+                  
+                  <input type="file" id="file-input-medical" accept=".pdf,.txt,image/*" style="display: none;">
+                  <label for="file-input-medical" class="category-upload-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <span>Carica Referto</span>
+                  </label>
+
+                  <div id="upload-loader-medical" class="upload-loader hidden">
+                    <div class="spinner-circle"></div>
+                    <div class="loader-text">Analisi referto...</div>
+                  </div>
+
+                  <ul id="docs-list-medical" class="category-docs-list">
+                    <!-- Dynamic files -->
+                  </ul>
+                </div>
+
+                <!-- 2. Fatture Terapie -->
+                <div class="doc-category-box category-invoice" id="dropzone-invoice">
+                  <header class="category-header">
+                    <div class="category-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                      </svg>
+                    </div>
+                    <h4>Fatture Terapie</h4>
+                  </header>
+                  
+                  <input type="file" id="file-input-invoice" accept=".pdf,.txt,image/*" style="display: none;">
+                  <label for="file-input-invoice" class="category-upload-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <span>Carica Fattura</span>
+                  </label>
+
+                  <div id="upload-loader-invoice" class="upload-loader hidden">
+                    <div class="spinner-circle"></div>
+                    <div class="loader-text">Analisi fattura...</div>
+                  </div>
+
+                  <ul id="docs-list-invoice" class="category-docs-list">
+                    <!-- Dynamic files -->
+                  </ul>
+                </div>
+
+                <!-- 3. Scuola (PEI) -->
+                <div class="doc-category-box category-school" id="dropzone-school">
+                  <header class="category-header">
+                    <div class="category-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+                      </svg>
+                    </div>
+                    <h4>Scuola (PEI)</h4>
+                  </header>
+                  
+                  <input type="file" id="file-input-school" accept=".pdf,.txt,image/*" style="display: none;">
+                  <label for="file-input-school" class="category-upload-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <span>Carica PEI</span>
+                  </label>
+
+                  <div id="upload-loader-school" class="upload-loader hidden">
+                    <div class="spinner-circle"></div>
+                    <div class="loader-text">Analisi scuola...</div>
+                  </div>
+
+                  <ul id="docs-list-school" class="category-docs-list">
+                    <!-- Dynamic files -->
+                  </ul>
+                </div>
+
+                <!-- 4. Certificazioni INPS -->
+                <div class="doc-category-box category-inps" id="dropzone-inps">
+                  <header class="category-header">
+                    <div class="category-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                    </div>
+                    <h4>Certificazioni INPS</h4>
+                  </header>
+                  
+                  <input type="file" id="file-input-inps" accept=".pdf,.txt,image/*" style="display: none;">
+                  <label for="file-input-inps" class="category-upload-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <span>Carica Certificato</span>
+                  </label>
+
+                  <div id="upload-loader-inps" class="upload-loader hidden">
+                    <div class="spinner-circle"></div>
+                    <div class="loader-text">Analisi INPS...</div>
+                  </div>
+
+                  <ul id="docs-list-inps" class="category-docs-list">
+                    <!-- Dynamic files -->
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Deadlines / Calendar Function View -->
+      <section class="deadlines-container hidden" id="deadlines-container">
+        <div class="deadlines-header">
+          <div class="deadlines-header-left">
+            <h2>Calendario e scadenze</h2>
+            <p id="deadlines-subtitle">Scadenze burocratiche e scolastiche del Lazio, calcolate sulla data odierna.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="deadlines-back-btn" style="width: auto;">
+            Torna alla Chat
+          </button>
+        </div>
+        <div class="deadlines-toolbar">
+          <div class="view-toggle" role="tablist" aria-label="Modalità di visualizzazione">
+            <button class="view-toggle-btn active" id="view-list-btn" role="tab" aria-selected="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              Lista
+            </button>
+            <button class="view-toggle-btn" id="view-calendar-btn" role="tab" aria-selected="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              Calendario
+            </button>
+          </div>
+          <button class="btn btn-primary btn-sm" id="deadline-add-btn" style="width: auto;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Aggiungi scadenza
+          </button>
+        </div>
+
+        <!-- Manual deadline form (hidden by default) -->
+        <form class="deadline-form hidden" id="deadline-form">
+          <div class="deadline-form-grid">
+            <div class="input-group deadline-form-title">
+              <label for="deadline-title">Titolo della scadenza</label>
+              <input type="text" id="deadline-title" placeholder="Es. Visita di controllo neuropsichiatria" autocomplete="off" maxlength="120">
+            </div>
+            <div class="input-group">
+              <label for="deadline-date">Data</label>
+              <input type="date" id="deadline-date">
+            </div>
+            <div class="input-group">
+              <label for="deadline-category">Categoria</label>
+              <div class="select-container">
+                <select id="deadline-category" class="profile-select">
+                  <option value="custom">Personale</option>
+                  <option value="buro">Burocrazia &amp; contributi</option>
+                  <option value="school">Scuola &amp; PEI</option>
+                  <option value="health">Sanità &amp; visite</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-group deadline-form-desc">
+              <label for="deadline-description">Note (opzionale)</label>
+              <textarea id="deadline-description" rows="2" placeholder="Dettagli, luogo, documenti da portare..." maxlength="500"></textarea>
+            </div>
+          </div>
+          <span class="error-msg" id="deadline-form-error" style="color: var(--danger-color); font-size: 12px; display: none;">Inserisci almeno un titolo e una data.</span>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-sm" id="deadline-save-btn" style="width: auto;">Salva scadenza</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="deadline-cancel-btn" style="width: auto;">Annulla</button>
+          </div>
+        </form>
+
+        <div class="deadlines-legend">
+          <span class="legend-item"><span class="legend-dot legend-buro"></span> Burocrazia &amp; contributi</span>
+          <span class="legend-item"><span class="legend-dot legend-school"></span> Scuola &amp; PEI</span>
+          <span class="legend-item"><span class="legend-dot legend-health"></span> Sanità &amp; visite</span>
+          <span class="legend-item"><span class="legend-dot legend-custom"></span> Personale</span>
+        </div>
+
+        <div class="deadlines-timeline" id="deadlines-timeline">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="deadlines-calendar hidden" id="deadlines-calendar">
+          <!-- Month grid populated dynamically -->
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Client-side script -->
+  <script src="app.js?v=1.3.0"></script>
+</body>
+</html>

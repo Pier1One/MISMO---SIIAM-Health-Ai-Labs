@@ -1,0 +1,46 @@
+Il punto di partenza ufficiale e centralizzato creato dalla Regione Lazio che fa da "hub" (ovvero da
+smistatore) per tutta la rete del Servizio TOBIA (DAMS - Disabilità Alta Qualità per la Medicina Specialistica)
+è ospitato sul portale sanitario regionale.
+Il link della pagina madre che raccoglie le linee guida, i criteri di accesso e i contatti diretti di tutti gli ospedali
+della rete è il seguente:
+• Il Router Centrale della Regione: Portale Salute Lazio - Sezione Servizio TOBIA (all'interno del
+portale basta digitare "TOBIA" nella barra di ricerca dei servizi per accedere alla dashboard di
+smistamento).
+Dato che stai programmando un'app, la cosa più utile per te è avere già i link diretti delle singole "antenne"
+ospedaliere del Lazio. In questo modo puoi creare nell'interfaccia dell'app dei bottoni di reindirizzamento
+immediato per i genitori, divisi per ospedale.
+Ecco la mappa dei link e dei contatti diretti dei principali poli della rete:
+1. Azienda Ospedaliera San Camillo Forlanini (Roma)
+È il polo storico dove è nato il progetto TOBIA. Gestisce un percorso di accoglienza straordinario per visite
+specialistiche, esami diagnostici e interventi.
+• Link diretto: Ospedale San Camillo - Pagina Servizio TOBIA
+• Email per i genitori: tobia@scamilloforlanini.rm.it
+2. Policlinico Umberto I (Roma)
+Attivissimo per la gestione di pazienti in età evolutiva e adulta nello spettro autistico non collaboranti,
+specializzato anche in cure odontoiatriche e chirurgia ambulatoriale in sedazione protetta.
+• Link diretto: Policlinico Umberto I - Percorso TOBIA
+• Email per i genitori: percorsotobia@policlinicoumberto1.it
+3. Fondazione Policlinico Tor Vergata (Roma)
+Ha strutturato il servizio TOBIA integrando strettamente i reparti di diagnostica e continuità assistenziale
+con il dipartimento di Neuropsichiatria.
+• Link diretto: Policlinico Tor Vergata - Servizio TOBIA
+• Email per i genitori: tobia@ptvonline.it
+4. Azienda Ospedaliera San Giovanni Addolorata (Roma)
+Un altro nodo fondamentale nel centro di Roma per l'accesso ai percorsi ambulatoriali protetti e ai pronti
+soccorsi coordinati.
+• Link diretto: Ospedale San Giovanni - Accoglienza TOBIA
+• Email per i genitori: tobia@hsangiovanni.roma.it
+Suggerimento di programmazione per la tua App
+Se vuoi rendere la sezione "Visite Mediche / Servizio Tobia" davvero eccezionale, potresti strutturare
+l'interfaccia così:
+1. Schermata Introduttiva: Spieghi cos'è il Servizio TOBIA (un percorso per fare visite mediche
+"normali" come dentista, oculista o prelievi in ambiente protetto se il bambino non collabora).
+2. Selettore Ospedale: Un menu a tendina o una griglia di bottoni con i loghi degli ospedali sopra
+elencati.
+3. Azioni Rapide: Sotto ogni ospedale selezionalo metti due tasti nativi:
+o Tasto "Invia Email di Richiesta" (che apre il client mail del genitore con l'indirizzo
+corretto già inserito, es. tobia@scamilloforlanini.rm.it).
+o Tasto "Apri Scheda Ospedale" (che rimanda ai link ufficiali qui sopra per scaricare la
+modulistica specifica di quel policlinico).
+Questo eviterà ai genitori di perdersi nei labirinti informatici della sanità laziale, risolvendo il problema in
+pochissimi secondi.

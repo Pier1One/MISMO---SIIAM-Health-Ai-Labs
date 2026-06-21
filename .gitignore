@@ -1,0 +1,11 @@
+# Dependency directories
+node_modules/
+
+# Environment variables (contains the Gemini API key)
+.env
+
+# OS generated files
+.DS_Store
+
+# Local configurations
+.claude/
